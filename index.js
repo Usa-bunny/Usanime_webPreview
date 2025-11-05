@@ -7,58 +7,56 @@ const path = require("path");
 const connectDB = require("./config/db");
 const MongoStore = require("connect-mongo");
 
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB Atlas Connected"))
-  .catch(err => console.error("❌ MongoDB Connection Error:", err));
-
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8080;
 
-// Import routes
-const authRoutes = require("./routes/authRoutes");
-const animeRoutes = require("./routes/animeRoutes");
-const historyRoutes = require("./routes/historyRoutes");
-
-// 🔗 Koneksi ke database
+// ✅ Connect DB hanya sekali
 connectDB();
 
-// 🧩 Setup view engine
+// ✅ View Engine
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// 🧩 Middleware parsing form dan JSON
+// ✅ Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
-// 🧩 Setup folder static
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 
-// 🧩 Setup session (gunakan MongoStore untuk kestabilan)
-const clientPromise = mongoose.connect(process.env.MONGO_URI).then(m => m.connection.getClient());
-app.use(session({
-    secret: 'secret-key',
+// ✅ Session (MongoStore)
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "secret-key",
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-        clientPromise
+      mongoUrl: process.env.MONGO_URI,
     }),
-    cookie: { maxAge: 1000 * 60 * 60 }
-}));
+    cookie: { maxAge: 1000 * 60 * 60 },
+  })
+);
 
-// 🧩 Middleware global untuk EJS
+// ✅ Global middleware
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
-  res.locals.isAdmin = (req.session.user?.akun?.role || req.session.user?.role) === "admin";
+  res.locals.isAdmin =
+    (req.session.user?.akun?.role || req.session.user?.role) === "admin";
   next();
 });
 
-// 🧩 Routes utama
-app.use("/auth", authRoutes);
-app.use("/anime", animeRoutes);
-app.use("/history", historyRoutes);
+// ✅ Routes
+app.use("/auth", require("./routes/authRoutes"));
+app.use("/anime", require("./routes/animeRoutes"));
+app.use("/history", require("./routes/historyRoutes"));
 
-// 🧩 Default redirect
+// ✅ Default redirect
 app.get("/", (req, res) => {
   res.redirect("/auth/login");
 });
+
+// ✅ RUN SERVER (WAJIB untuk Railway)
+app.listen(port, () => {
+  console.log(`🚀 Server running at http://localhost:${port}`);
+});
+
+module.exports = app;
