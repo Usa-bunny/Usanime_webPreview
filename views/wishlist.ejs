@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wishlist Anime</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="anime-body">
+  <%- include('sidebar') %>
+
+  <div class="content-wrapper">
+    <div class="page-header">
+      <h1 class="page-title">Wishlist Anime</h1>
+      <p class="page-subtitle">Anime yang ingin kamu tonton</p>
+    </div>
+
+    <% if (wishlist.length === 0) { %>
+      <div class="empty-state">
+        Kamu belum menambahkan anime ke wishlist.
+        <br>
+        <small style="color: #ffaaaa; margin-top: 10px; display: block;">
+          Jelajahi daftar anime dan tambahkan favoritmu ke sini!
+        </small>
+      </div>
+    <% } else { %>
+      <div class="anime-container">
+        <% wishlist.forEach(item => { %>
+          <div class="anime-item wishlist">
+            <img src="/uploads/<%= item.anime.cover %>" alt="<%= item.anime.title %>" class="anime-cover">
+
+            <div class="anime-info">
+              <h3><%= item.anime.title %></h3>
+              <p><strong>🏷️ Genre:</strong> <%= item.anime.genre.join(", ") %></p>
+              <p><strong>⭐ Rating:</strong> <%= item.anime.rating %>/10</p>
+              <p><strong>🎬 Episode:</strong> <%= item.anime.episodes %></p>
+              <p class="anime-synopsis"><strong>📖 Sinopsis:</strong> <%= item.anime.synopsis %></p>
+            </div>
+
+            <div class="anime-actions">
+              <a href="/anime/wishlist/<%= item.anime._id %>" class="btn btn-danger">❌ Hapus Wishlist</a>
+              <a href="/history/add/<%= item.anime._id %>" class="btn btn-primary">▶️ Tonton Sekarang</a>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</body>
+</html>

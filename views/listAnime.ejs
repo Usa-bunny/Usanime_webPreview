@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Anime</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="anime-body">
+  <%- include('sidebar') %>
+
+  <div class="content-wrapper">
+    <div class="page-header">
+      <h1 class="page-title">Daftar Anime</h1>
+      <p class="page-subtitle">Jelajahi koleksi anime terbaik kami</p>
+    </div>
+
+    <div class="anime-container">
+        <% animeList.forEach(anime => { %>
+            <div class="anime-item">
+                <img src="/uploads/<%= anime.cover %>" alt="<%= anime.title %>" class="anime-cover">
+
+                <div class="anime-info">
+                    <h3><%= anime.title %></h3>
+                    <p><strong>⭐ Rating:</strong> <%= anime.rating %>/10</p>
+                    <p><strong>🏷️ Genre:</strong> <%= anime.genre.join(", ") %></p>
+                    <p><strong>🎬 Episode:</strong> <%= anime.episodes %></p>
+                    <p class="anime-synopsis"><strong>📖 Sinopsis:</strong> <%= anime.synopsis %></p>
+                </div>
+
+                <div class="anime-actions">
+                    <a href="/anime/wishlist/<%= anime._id %>" class="btn <%= anime.wishlist ? 'btn-danger' : 'btn-primary' %>">
+                        <% if (anime.wishlist) { %>❌ Hapus Wishlist<% } else { %>❤️ Tambah Wishlist<% } %>
+                    </a>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+  </div>
+</body>
+</html>

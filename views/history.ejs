@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riwayat Tontonan</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="anime-body">
+  <%- include('sidebar') %>
+
+  <div class="content-wrapper">
+    <div class="page-header">
+      <h1 class="page-title">Riwayat Tontonan</h1>
+      <p class="page-subtitle">Lacak anime yang sudah kamu tonton</p>
+    </div>
+
+    <% if (historyList.length === 0) { %>
+      <div class="empty-state">
+        Belum ada riwayat tontonan.
+        <br>
+        <small style="color: #ffaaaa; margin-top: 10px; display: block;">
+          Mulai tonton anime dari wishlist untuk melihat riwayat di sini!
+        </small>
+      </div>
+    <% } else { %>
+      <div class="anime-container">
+        <% historyList.forEach(item => { %>
+          <div class="anime-item">
+            <img src="/uploads/<%= item.anime_id.cover %>" alt="<%= item.anime_id.title %>" class="anime-cover">
+
+            <div class="anime-info">
+              <h3><%= item.anime_id.title %></h3>
+              <p><strong>📊 Status:</strong> 
+                <span style="color: '<%= item.status === 'Selesai' ? '#28a745' : '#ffc107' %>'; font-weight: bold;"><%= item.status %></span>
+              </p>
+              <p><strong>🕒 Ditonton pada:</strong> <%= new Date(item.watched_at).toLocaleString('id-ID') %></p>
+              <p><strong>⭐ Rating:</strong> <%= item.anime_id.rating %>/10</p>
+            </div>
+
+            <div class="anime-actions">
+              <a href="<%= item.anime_id.link %>" class="btn btn-danger">▶️ Lanjutkan Menonton</a>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</body>
+</html>
