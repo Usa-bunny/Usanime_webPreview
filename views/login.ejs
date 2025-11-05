@@ -3,29 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <title>Login - Usanime</title>
+  <link rel="stylesheet" href="/css/loginregister.css">
 </head>
 <body class="login-body">
   <div class="login-container">
-    <h2>Login</h2>
+    <div class="auth-brand">
+      <div class="brand-logo">🎬</div>
+      <div class="brand-text">Usanime</div>
+    </div>
 
-    <form action="/auth/login" method="POST">
-      <!-- Username -->
-      <label for="username">Username</label>
-      <input type="text" id="username" name="username" required>
+    <div class="auth-header">
+      <h2>Masuk</h2>
+      <p class="auth-subtitle">Selamat datang kembali!</p>
+    </div>
 
-      <!-- Password -->
-      <label for="password">Password</label>
-      <input type="password" id="password" name="password" required>
-
-      <!-- Tombol dan link -->
-      <div class="form-links">
-        <a href="/auth/register">Belum punya akun? Register</a>
+    <form action="/auth/login" method="POST" class="auth-form">
+      <div class="form-group">
+        <label for="username" class="form-label">Username</label>
+        <input type="text" id="username" name="username" class="form-input" placeholder="Masukkan username Anda" required>
       </div>
 
-      <button type="submit">Masuk</button>
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" id="password" name="password" class="form-input" placeholder="Masukkan password Anda" required>
+      </div>
+
+      <button type="submit" class="auth-button">Masuk ke Akun</button>
+
+      <div class="form-links">
+        <a href="/auth/register">Belum punya akun? Daftar Sekarang</a>
+      </div>
     </form>
   </div>
+
+  <script>
+    // Form validation
+    document.querySelector('.auth-form').addEventListener('submit', function(e) {
+      const inputs = this.querySelectorAll('input[required]');
+      let valid = true;
+      
+      inputs.forEach(input => {
+        if (!input.value.trim()) {
+          input.classList.add('invalid');
+          valid = false;
+        } else {
+          input.classList.remove('invalid');
+          input.classList.add('valid');
+        }
+      });
+      
+      if (!valid) {
+        e.preventDefault();
+        alert('Harap isi semua field yang diperlukan!');
+      }
+    });
+  </script>
 </body>
 </html>

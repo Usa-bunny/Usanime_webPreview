@@ -3,37 +3,139 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Register</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <title>Daftar - Usanime</title>
+  <link rel="stylesheet" href="/css/loginregister.css">
 </head>
 <body class="register-body">
   <div class="register-container">
-    <h2>Register</h2>
+    <div class="auth-brand">
+      <div class="brand-logo floating-element">🎬</div>
+      <div class="brand-text">Usanime</div>
+    </div>
 
-    <form action="/auth/register" method="POST">
-      <!-- Nama -->
-      <label for="nama">Nama</label>
-      <input type="text" id="nama" name="nama" required>
+    <div class="auth-header">
+      <h2>Daftar</h2>
+      <p class="auth-subtitle">Bergabung dengan komunitas anime!</p>
+    </div>
 
-      <!-- Email -->
-      <label for="email">Email</label>
-      <input type="email" id="email" name="email" required>
-
-      <!-- Username -->
-      <label for="username">Username</label>
-      <input type="text" id="username" name="username" required>
-
-      <!-- Password -->
-      <label for="password">Password</label>
-      <input type="password" id="password" name="password" required>
-
-      <!-- Tombol dan link -->
-      <div class="form-links">
-        <a href="/auth/login">Sudah punya akun? Login</a>
+    <form action="/auth/register" method="POST" class="auth-form">
+      <div class="form-group">
+        <label for="nama" class="form-label">Nama Lengkap</label>
+        <input type="text" id="nama" name="nama" class="form-input" placeholder="Masukkan nama lengkap Anda" required>
       </div>
 
-      <button type="submit">Daftar</button>
+      <div class="form-group">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" id="email" name="email" class="form-input" placeholder="Masukkan email Anda" required>
+      </div>
+
+      <div class="form-group">
+        <label for="username" class="form-label">Username</label>
+        <input type="text" id="username" name="username" class="form-input" placeholder="Pilih username unik" required>
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" id="password" name="password" class="form-input" placeholder="Buat password yang kuat" required>
+        <div class="password-strength">
+          <div class="strength-bar"></div>
+        </div>
+        <div class="validation-message">Gunakan kombinasi huruf, angka, dan simbol</div>
+      </div>
+
+      <button type="submit" class="auth-button">Buat Akun Baru</button>
+
+      <div class="form-links">
+        <a href="/auth/login">Sudah punya akun? Masuk Sekarang</a>
+      </div>
     </form>
   </div>
+
+  <script>
+    // Enhanced password strength indicator for register
+    const passwordInput = document.getElementById('password');
+    const strengthBar = document.querySelector('.strength-bar');
+    const validationMessage = document.querySelector('.validation-message');
+
+    passwordInput.addEventListener('input', function(e) {
+      const password = e.target.value;
+      let strength = 0;
+      const messages = [];
+      
+      if (password.length >= 8) {
+        strength += 1;
+      } else {
+        messages.push('minimal 8 karakter');
+      }
+      
+      if (/[A-Z]/.test(password)) {
+        strength += 1;
+      } else {
+        messages.push('huruf kapital');
+      }
+      
+      if (/[0-9]/.test(password)) {
+        strength += 1;
+      } else {
+        messages.push('angka');
+      }
+      
+      if (/[^A-Za-z0-9]/.test(password)) {
+        strength += 1;
+      } else {
+        messages.push('simbol');
+      }
+      
+      // Update strength bar
+      strengthBar.className = 'strength-bar';
+      if (strength > 0 && password.length > 0) {
+        strengthBar.classList.add(
+          strength <= 1 ? 'strength-weak' :
+          strength <= 2 ? 'strength-medium' : 'strength-strong'
+        );
+      }
+      
+      // Update validation message
+      if (password.length === 0) {
+        validationMessage.textContent = 'Gunakan kombinasi huruf, angka, dan simbol';
+        validationMessage.className = 'validation-message';
+      } else if (strength === 4) {
+        validationMessage.textContent = 'Password kuat! ✓';
+        validationMessage.className = 'validation-message valid';
+      } else {
+        validationMessage.textContent = `Butuh: ${messages.join(', ')}`;
+        validationMessage.className = 'validation-message invalid';
+      }
+    });
+
+    // Form validation
+    document.querySelector('.auth-form').addEventListener('submit', function(e) {
+      const password = document.getElementById('password').value;
+      const inputs = this.querySelectorAll('input[required]');
+      let valid = true;
+      
+      inputs.forEach(input => {
+        if (!input.value.trim()) {
+          input.classList.add('invalid');
+          valid = false;
+        } else {
+          input.classList.remove('invalid');
+          input.classList.add('valid');
+        }
+      });
+      
+      // Password strength check
+      if (password.length < 8) {
+        document.getElementById('password').classList.add('invalid');
+        validationMessage.textContent = 'Password harus minimal 8 karakter!';
+        validationMessage.className = 'validation-message invalid';
+        valid = false;
+      }
+      
+      if (!valid) {
+        e.preventDefault();
+      }
+    });
+  </script>
 </body>
 </html>
