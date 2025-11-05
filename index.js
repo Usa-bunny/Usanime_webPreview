@@ -62,8 +62,3 @@ app.use("/history", historyRoutes);
 app.get("/", (req, res) => {
   res.redirect("/auth/login");
 });
-
-// 🧩 Jalankan server
-app.listen(port, () => {
-  console.log(`🚀 Server berjalan di http://localhost:${port}`);
-});
