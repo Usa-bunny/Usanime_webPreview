@@ -1,0 +1,68 @@
+<button class="sidebar-toggle" type="button">☰</button>
+<div class="sidebar-overlay"></div>
+
+<aside class="sidebar">
+  <h1>Usanime</h1>
+  <nav>
+    <% if (user && user.role === 'admin') { %>
+      <ul>
+        <li><a href="/anime/admin">🎬 Kelola Anime</a></li>
+        <li><a href="/anime/add">➕ Tambah Anime</a></li>
+        <li><a href="/anime">📺 Daftar Anime</a></li>
+        <li><a href="/anime/wishlist">❤️ Wishlist Anime</a></li>
+        <li><a href="/history">📊 Riwayat Tontonan</a></li>
+      </ul>
+    <% } else if (user && user.role === 'user') { %>
+      <ul>
+        <li><a href="/anime">📺 Daftar Anime</a></li>
+        <li><a href="/anime/wishlist">❤️ Wishlist Anime</a></li>
+        <li><a href="/history">📊 Riwayat Tontonan</a></li>
+      </ul>
+    <% } %>
+  </nav>
+
+  <form action="/auth/logout" method="GET" class="logout-form">
+    <button type="submit">Logout</button>
+  </form>
+</aside>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const sidebarToggle = document.querySelector('.sidebar-toggle');
+  const sidebar = document.querySelector('.sidebar');
+  const sidebarOverlay = document.querySelector('.sidebar-overlay');
+
+  if (sidebarToggle && sidebar) {
+    sidebarToggle.addEventListener('click', function() {
+      sidebar.classList.toggle('active');
+      sidebarOverlay.classList.toggle('active');
+    });
+
+    sidebarOverlay.addEventListener('click', function() {
+      sidebar.classList.remove('active');
+      sidebarOverlay.classList.remove('active');
+    });
+
+    // Close sidebar when clicking on links in mobile
+    if (window.innerWidth <= 767) {
+      const sidebarLinks = sidebar.querySelectorAll('a');
+      sidebarLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          sidebar.classList.remove('active');
+          sidebarOverlay.classList.remove('active');
+        });
+      });
+    }
+  }
+});
+
+window.addEventListener('resize', function() {
+  const sidebar = document.querySelector('.sidebar');
+  const sidebarOverlay = document.querySelector('.sidebar-overlay');
+  
+  if (window.innerWidth > 767) {
+    sidebar.classList.remove('active');
+    sidebarOverlay.classList.remove('active');
+  }
+});
+</script>
