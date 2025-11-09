@@ -27,19 +27,19 @@
       <div class="anime-container">
         <% historyList.forEach(item => { %>
           <div class="anime-item">
-            <img src="/uploads/<%= item.anime_id.cover %>" alt="<%= item.anime_id.title %>" class="anime-cover">
+            <img src="<%= item.anime.cover %>" alt="<%= item.anime.title %>" class="anime-cover">
 
             <div class="anime-info">
-              <h3><%= item.anime_id.title %></h3>
+              <h3><%= item.anime.title %></h3>
               <p><strong>📊 Status:</strong> 
                 <span style="color: '<%= item.status === 'Selesai' ? '#28a745' : '#ffc107' %>'; font-weight: bold;"><%= item.status %></span>
               </p>
               <p><strong>🕒 Ditonton pada:</strong> <%= new Date(item.watched_at).toLocaleString('id-ID') %></p>
-              <p><strong>⭐ Rating:</strong> <%= item.anime_id.rating %>/10</p>
+              <p><strong>⭐ Rating:</strong> <%= item.anime.rating %>/10</p>
             </div>
 
             <div class="anime-actions">
-              <a href="<%= item.anime_id.link %>" class="btn btn-danger">▶️ Lanjutkan Menonton</a>
+              <a href="<%= item.anime.link %>" class="btn btn-danger">▶️ Lanjutkan Menonton</a>
             </div>
           </div>
         <% }) %>
@@ -48,3 +48,4 @@
   </div>
 </body>
 </html>
+

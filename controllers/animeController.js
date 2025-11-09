@@ -1,170 +1,230 @@
-const { get } = require('mongoose');
-const Anime = require('../models/animeModel');
-const Wishlist = require('../models/wishlistModel');
-const path = require('path');
-const fs = require('fs');
+const Anime = require("../models/animeModel");
+const Wishlist = require("../models/wishlistModel");
+const History = require('../models/historyModel');
+const cloudinary = require('../config/cloudinary')
+const fs = require("fs");
 
 const animeController = {
+
     getAllAnime: async (req, res) => {
         try {
-        const userId = req.session?.user?.id;
-        const animeList = await Anime.find();
+            const userId = req.session?.user?._id;
+            const animeList = await Anime.find();
 
-        const wishlist = await Wishlist.find({ user: userId }).select('anime');
-        const wishlistIds = wishlist.map(w => w.anime.toString());
+            const wishlist = userId 
+                ? await Wishlist.find({ user: userId }).select("anime")
+                : [];
 
-        res.render('listAnime', {
-            animeList: animeList.map(anime => ({
-            ...anime.toObject(),
-            wishlist: wishlistIds.includes(anime._id.toString())
-            }))
-        });
+            const wishlistIds = wishlist.map(w => w.anime.toString());
+
+            res.render("listAnime", {
+                animeList: animeList.map(anime => ({
+                    ...anime.toObject(),
+                    wishlist: wishlistIds.includes(anime._id.toString())
+                }))
+            });
+
         } catch (error) {
-        console.error("Error fetching anime list:", error);
-        res.status(500).send("Terjadi kesalahan saat memuat daftar anime.");
+            console.error(error);
+            res.status(500).send("Error fetching anime list");
         }
     },
 
     getAllAnimeAdmin: async (req, res) => {
         try {
             const animeList = await Anime.find();
-            res.render('listAnimeAdmin', { animeList });
+            res.render("listAnimeAdmin", { animeList });
         } catch (error) {
-            console.error("Error fetching anime list:", error);
-            res.status(500).send("an error occurred while fetching the anime list.");
+            console.error(error);
+            res.status(500).send("Error fetching anime list (admin)");
         }
     },
 
     getAddAnime: (req, res) => {
-        try {
-            res.render('formAddAnime');
-        } catch (error) {
-            console.error("Error rendering add anime form:", error);
-            res.status(500).send("an error occurred while loading the add anime form.");
-        }
+        res.render("formAddAnime");
     },
 
     addAnime: async (req, res) => {
         try {
             const { title, rating, genre, synopsis, episodes, link } = req.body;
-            const cover = req.file ? req.file.filename : null;
-            const anime = new Anime({
-                cover: cover,
-                title: title,
-                rating: rating,
-                genre: genre,
-                synopsis: synopsis,
-                episodes: episodes,
-                link: link
+
+            if (!req.file) {
+                return res.status(400).send("File cover wajib diupload");
+            }
+
+            const upload = req.file; 
+
+            await Anime.create({
+                title,
+                rating,
+                genre,
+                synopsis,
+                episodes,
+                link,
+                cover: upload.path,       
+                public_id: upload.filename 
             });
-            await anime.save();
-            res.redirect('/anime');
+
+            res.redirect("/anime");
         } catch (error) {
-            console.error("Error adding new anime:", error);
-            res.status(500).send("an error occurred while adding the new anime.");
+            console.error(error);
+            res.status(500).send("Error adding anime");
         }
     },
 
     getEditAnime: async (req, res) => {
         try {
-            const animeId = req.params.id;
-            const anime = await Anime.findById(animeId);
-            res.render('formEditAnime', { anime });
+            const anime = await Anime.findById(req.params.id);
+            if (!anime) return res.status(404).send("Anime not found");
+            res.render("formEditAnime", { anime });
         } catch (error) {
-            console.error("Error fetching anime details:", error);
-            res.status(500).send("an error occurred while fetching anime details.");
+            console.error(error);
+            res.status(500).send("Error loading anime");
         }
     },
 
     editAnime: async (req, res) => {
         try {
-            const animeId = req.params.id;
-            const { title, rating, genre, synopsis, episodes, link } = req.body;
-            const cover = req.file ? req.file.filename : null;
+        const anime = await Anime.findById(req.params.id);
+        if (!anime) return res.status(404).send("Anime not found");
 
-            const anime = await Anime.findById(animeId);
-            if (!anime) {
-                return res.status(404).send("Anime not found.");
+        const { title, rating, genre, synopsis, episodes, link } = req.body;
+
+        if (req.file) {
+            if (anime.public_id) {
+            await cloudinary.uploader.destroy(anime.public_id);
             }
 
-            if (cover && anime.cover) {
-                const oldCoverPath = path.join(__dirname, '../public/uploads', anime.cover);
-                if (fs.existsSync(oldCoverPath)) {
-                    fs.unlinkSync(oldCoverPath);
-                }
-            }
+            const upload = req.file;
 
-            anime.cover = cover || anime.cover;
-            anime.title = title || anime.title;
-            anime.rating = rating || anime.rating;
-            anime.genre = genre || anime.genre;
-            anime.synopsis = synopsis || anime.synopsis;
-            anime.episodes = episodes || anime.episodes;
-            anime.link = link || anime.link;
+            anime.cover = upload.path;
+            anime.public_id = upload.filename;
+        }
 
-            await anime.save();
-            res.redirect('/anime');
+        anime.title = title;
+        anime.rating = rating;
+        anime.genre = genre;
+        anime.synopsis = synopsis;
+        anime.episodes = episodes;
+        anime.link = link;
+
+        await anime.save();
+        res.redirect("/anime");
         } catch (error) {
-            console.error("Error updating anime:", error);
-            res.status(500).send("an error occurred while updating the anime.");
+        console.error(error);
+        res.status(500).send("Error updating anime");
         }
     },
 
+
     deleteAnime: async (req, res) => {
         try {
-            const animeId = req.params.id;
-            const anime = await Anime.findById(animeId);
+            const anime = await Anime.findById(req.params.id);
+            if (!anime) return res.status(404).send("Anime not found");
 
-            if (!anime) {
-                return res.status(404).send("Anime not found.");
+            if (anime.public_id) {
+                await cloudinary.uploader.destroy(anime.public_id);
             }
 
-            if (anime.cover) {
-                const coverPath = path.join(__dirname, '../public/uploads', anime.cover);
-                if (fs.existsSync(coverPath)){
-                    fs.unlinkSync(coverPath);
-                }
-            }
+            await Anime.findByIdAndDelete(req.params.id);
+            res.redirect("/anime");
 
-            await Anime.findByIdAndDelete(animeId);
-            res.redirect('/anime');
         } catch (error) {
-            console.error("Error deleting anime:", error);
-            res.status(500).send("an error occurred while deleting the anime.");
+            console.error(error);
+            res.status(500).send("Error deleting anime");
         }
     },
 
     toggleWishlist: async (req, res) => {
         try {
-            const userId = req.session.user.id;
+            const userId = req.session?.user?._id;
+            if (!userId) return res.redirect("/auth/login");
+
             const animeId = req.params.id;
+            const exist = await Wishlist.findOne({ user: userId, anime: animeId });
 
-            const existing = await Wishlist.findOne({ user: userId, anime: animeId });
+            exist
+                ? await Wishlist.deleteOne({ _id: exist._id })
+                : await Wishlist.create({ user: userId, anime: animeId });
 
-            if (existing) {
-                await Wishlist.findByIdAndDelete(existing._id);
-            } else {
-                const newWishlist = new Wishlist({ user: userId, anime: animeId });
-                await newWishlist.save();
-            }
+            res.redirect("/anime");
 
-            res.redirect('/anime');
         } catch (error) {
-            console.error("Error updating wishlist:", error);
-            res.status(500).send('Gagal mengubah wishlist.');
+            console.error(error);
+            res.status(500).send("Wishlist update failed");
         }
     },
 
     getWishlist: async (req, res) => {
         try {
-            const userId = req.session.user.id;
-            const wishlist = await Wishlist.find({ user: userId }).populate('anime');
-            res.render('wishlist', { wishlist });
+            const userId = req.session?.user?._id;
+            const wishlist = await Wishlist.find({ user: userId })
+                .populate("anime")
+                .then(list => list.filter(item => item.anime)); 
+
+            res.render("wishlist", { wishlist });
         } catch (error) {
-            console.error("Error fetching wishlist:", error);
-            res.status(500).send('Gagal memuat wishlist.');
+            console.error(error);
+            res.status(500).send("Failed to load wishlist");
         }
     },
-}
+
+    addToHistory: async (req, res) => {
+        try {
+            if (!req.session.user) {
+                return res.status(401).send("Harus login dulu boss 😭");
+            }
+
+            const userId = req.session.user._id;
+            const animeId = req.params.id;
+
+            const anime = await Anime.findById(animeId);
+            if (!anime) return res.status(404).send("Anime ga ketemu 😭");
+
+            let history = await History.findOne({ user: userId, anime: animeId });
+
+            if (!history) {
+                await History.create({
+                    user: userId,
+                    anime: animeId,
+                    watched_at: new Date(),
+                    status: "watching"
+                });
+            } else {
+                history.watched_at = new Date();
+                await history.save();
+            }
+
+            return res.redirect(anime.link);
+
+        } catch (error) {
+            console.error(error);
+            res.status(500).send("Gagal update history");
+        }
+    },
+
+    getHistory: async (req, res) => {
+        try {
+            const userId = req.session.user?._id;
+            if (!userId) return res.redirect("/login");
+
+            let historyList = await History.find({ user: userId })
+                .populate("anime")
+                .sort({ createdAt: -1 });
+
+            // 🔧 Filter history yang anime-nya udah kehapus
+            historyList = historyList.filter(item => item.anime !== null);
+
+            res.render("history", {
+                title: "Riwayat Tontonan",
+                historyList,
+            });
+        } catch (err) {
+            console.error(err);
+            res.status(500).send("Terjadi kesalahan saat mengambil riwayat.");
+        }
+    }
+
+};
 
 module.exports = animeController;

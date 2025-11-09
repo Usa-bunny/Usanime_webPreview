@@ -27,7 +27,7 @@
       <div class="anime-container">
         <% wishlist.forEach(item => { %>
           <div class="anime-item wishlist">
-            <img src="/uploads/<%= item.anime.cover %>" alt="<%= item.anime.title %>" class="anime-cover">
+            <img src="<%= item.anime.cover %>" alt="<%= item.anime.title %>" class="anime-cover">
 
             <div class="anime-info">
               <h3><%= item.anime.title %></h3>
@@ -39,7 +39,7 @@
 
             <div class="anime-actions">
               <a href="/anime/wishlist/<%= item.anime._id %>" class="btn btn-danger">❌ Hapus Wishlist</a>
-              <a href="/history/add/<%= item.anime._id %>" class="btn btn-primary">▶️ Tonton Sekarang</a>
+              <a href="/anime/history/add/<%= item.anime._id %>" class="btn btn-primary">▶️ Tonton Sekarang</a>
             </div>
           </div>
         <% }) %>

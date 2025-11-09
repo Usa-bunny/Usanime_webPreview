@@ -47,7 +47,6 @@ app.use((req, res, next) => {
 // ✅ Routes
 app.use("/auth", require("./routes/authRoutes"));
 app.use("/anime", require("./routes/animeRoutes"));
-app.use("/history", require("./routes/historyRoutes"));
 
 // ✅ Default redirect
 app.get("/", (req, res) => {

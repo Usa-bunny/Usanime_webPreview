@@ -18,7 +18,18 @@ router.post('/add', checkRole('admin'), checkSession, uploadImage.single('cover'
 router.post('/edit/:id', checkRole('admin'), checkSession, uploadImage.single('cover'), animeController.editAnime);
 
 // Wishlist routes
-router.get('/wishlist', checkRole('user', 'admin'), animeController.getWishlist);
-router.get('/wishlist/:id', checkRole('user', 'admin'), animeController.toggleWishlist);
+router.get('/wishlist', checkRole('user', 'admin'), checkSession, animeController.getWishlist);
+router.get('/wishlist/:id', checkRole('user', 'admin'), checkSession, animeController.toggleWishlist);
+
+// History routes
+router.get('/history', checkRole('user', 'admin'), checkSession, animeController.getHistory);
+router.get('/history/add/:id', checkRole('user', 'admin'), checkSession, animeController.addToHistory);
 
 module.exports = router;
+
+
+
+
+
+
+

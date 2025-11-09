@@ -3,7 +3,13 @@ const mongoose = require("mongoose");
 const animeSchema = new mongoose.Schema({
     cover: {
         type: String,
-        required: true
+        required: false,
+        default: null
+    },
+    public_id: {
+        type: String,
+        required: false,
+        default: null
     },
     title: {
         type: String,
