@@ -65,7 +65,7 @@ const animeController = {
                 public_id: upload.filename 
             });
 
-            res.redirect("/anime");
+            res.redirect("/usanime");
         } catch (error) {
             console.error(error);
             res.status(500).send("Error adding anime");
@@ -109,7 +109,7 @@ const animeController = {
         anime.link = link;
 
         await anime.save();
-        res.redirect("/anime");
+        res.redirect("/usanime");
         } catch (error) {
         console.error(error);
         res.status(500).send("Error updating anime");
@@ -127,7 +127,7 @@ const animeController = {
             }
 
             await Anime.findByIdAndDelete(req.params.id);
-            res.redirect("/anime");
+            res.redirect("/usanime");
 
         } catch (error) {
             console.error(error);
@@ -147,7 +147,7 @@ const animeController = {
                 ? await Wishlist.deleteOne({ _id: exist._id })
                 : await Wishlist.create({ user: userId, anime: animeId });
 
-            res.redirect("/anime");
+            res.redirect("/usanime");
 
         } catch (error) {
             console.error(error);

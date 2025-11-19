@@ -10,20 +10,20 @@ const MongoStore = require("connect-mongo");
 const app = express();
 const port = process.env.PORT || 8080;
 
-// ✅ Connect DB hanya sekali
+// Connect DB hanya sekali
 connectDB();
 
-// ✅ View Engine
+// View Engine
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// ✅ Middleware
+// Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
 
-// ✅ Session (MongoStore)
+// Session 
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "secret-key",
@@ -32,11 +32,11 @@ app.use(
     store: MongoStore.create({
       mongoUrl: process.env.MONGO_URI,
     }),
-    cookie: { maxAge: 1000 * 60 * 60 },
+    cookie: { maxAge: 1000 * 60 * 24 },
   })
 );
 
-// ✅ Global middleware
+// Global middleware
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
   res.locals.isAdmin =
@@ -44,16 +44,16 @@ app.use((req, res, next) => {
   next();
 });
 
-// ✅ Routes
+// Routes
 app.use("/auth", require("./routes/authRoutes"));
-app.use("/anime", require("./routes/animeRoutes"));
+app.use("/usanime", require("./routes/animeRoutes"));
 
-// ✅ Default redirect
+// Default redirect
 app.get("/", (req, res) => {
   res.redirect("/auth/login");
 });
 
-// ✅ RUN SERVER (WAJIB untuk Railway)
+// RUN SERVER
 app.listen(port, () => {
   console.log(`🚀 Server running at http://localhost:${port}`);
 });

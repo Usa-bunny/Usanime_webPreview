@@ -66,9 +66,9 @@ const authController = {
 
 
             if (user.akun.role === 'admin') {
-                res.redirect('/anime/admin');
+                res.redirect('/usanime/admin');
             } else {
-                res.redirect('/anime');
+                res.redirect('/usanime');
             }
         } catch (error) {
             console.error(error);
