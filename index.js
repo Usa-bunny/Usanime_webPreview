@@ -8,7 +8,7 @@ const connectDB = require("./config/db");
 const MongoStore = require("connect-mongo");
 
 const app = express();
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 3000;
 
 // Connect DB hanya sekali
 connectDB();

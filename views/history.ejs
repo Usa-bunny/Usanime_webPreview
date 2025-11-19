@@ -4,48 +4,148 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Riwayat Tontonan</title>
+
+  <!-- BOOTSTRAP -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
   <link rel="stylesheet" href="/css/style.css">
+
+  <style>
+    /* Konten bergeser saat sidebar terbuka (desktop) */
+    @media (min-width: 768px) {
+      .content-with-sidebar {
+        margin-left: 260px;
+      }
+    }
+
+    /* KARTU ANIME - Sama persis dengan halaman lainnya */
+    .anime-card {
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+      transition: .25s;
+      border: 1px solid #ddd;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .anime-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+
+    .anime-img {
+      width: 100%;
+      height: 400px;
+      object-fit: cover;
+    }
+
+    .anime-title {
+      padding: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      text-align: center;
+      min-height: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .anime-info-box {
+      padding: 12px 15px;
+      font-size: 0.9rem;
+    }
+
+    .anime-actions {
+      padding: 15px;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: #ccc;
+      font-size: 1.2rem;
+      padding-top: 40px;
+    }
+  </style>
 </head>
+
 <body class="anime-body">
+
   <%- include('sidebar') %>
 
-  <div class="content-wrapper">
-    <div class="page-header">
-      <h1 class="page-title">Riwayat Tontonan</h1>
-      <p class="page-subtitle">Lacak anime yang sudah kamu tonton</p>
+  <div class="content-with-sidebar">
+
+    <div class="container py-4">
+
+      <!-- HEADER -->
+      <div class="text-center mb-4">
+        <h1 class="fw-bold">Riwayat Tontonan</h1>
+        <p class="text-muted">Lacak anime yang sudah kamu tonton</p>
+      </div>
+
+      <% if (historyList.length === 0) { %>
+
+        <div class="empty-state">
+          Belum ada riwayat tontonan.
+          <br>
+          <small style="color: #ffaaaa; margin-top: 10px; display: block;">
+            Mulai tonton anime dari wishlist untuk melihat riwayat di sini!
+          </small>
+        </div>
+
+      <% } else { %>
+
+        <div class="row g-4">
+
+          <% historyList.forEach(item => { %>
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+
+              <div class="anime-card">
+
+                <!-- COVER -->
+                <img src="<%= item.anime.cover %>" class="anime-img" alt="<%= item.anime.title %>">
+
+                <!-- TITLE -->
+                <div class="anime-title">
+                  <%= item.anime.title %>
+                </div>
+
+                <!-- INFO -->
+                <div class="anime-info-box">
+                  <p class="mb-1"><strong>📊 Status:</strong>
+                    <% if (item.status === 'Selesai') { %>
+                      <span style="color:#28a745; font-weight:bold;"><%= item.status %></span>
+                    <% } else { %>
+                      <span style="color:#ffc107; font-weight:bold;"><%= item.status %></span>
+                    <% } %>
+                  </p>
+
+                  <p class="mb-1">
+                    <strong>🕒 Ditonton pada:</strong><br>
+                    <%= new Date(item.watched_at).toLocaleString('id-ID') %>
+                  </p>
+
+                  <p class="mb-1"><strong>⭐ Rating:</strong> <%= item.anime.rating %>/10</p>
+                </div>
+
+                <!-- BUTTON -->
+                <div class="anime-actions">
+                  <a href="<%= item.anime.link %>" class="btn btn-danger w-100">▶️ Lanjutkan Menonton</a>
+                </div>
+
+              </div>
+
+            </div>
+          <% }) %>
+
+        </div>
+
+      <% } %>
+
     </div>
 
-    <% if (historyList.length === 0) { %>
-      <div class="empty-state">
-        Belum ada riwayat tontonan.
-        <br>
-        <small style="color: #ffaaaa; margin-top: 10px; display: block;">
-          Mulai tonton anime dari wishlist untuk melihat riwayat di sini!
-        </small>
-      </div>
-    <% } else { %>
-      <div class="anime-container">
-        <% historyList.forEach(item => { %>
-          <div class="anime-item">
-            <img src="<%= item.anime.cover %>" alt="<%= item.anime.title %>" class="anime-cover">
-
-            <div class="anime-info">
-              <h3><%= item.anime.title %></h3>
-              <p><strong>📊 Status:</strong> 
-                <span style="color: '<%= item.status === 'Selesai' ? '#28a745' : '#ffc107' %>'; font-weight: bold;"><%= item.status %></span>
-              </p>
-              <p><strong>🕒 Ditonton pada:</strong> <%= new Date(item.watched_at).toLocaleString('id-ID') %></p>
-              <p><strong>⭐ Rating:</strong> <%= item.anime.rating %>/10</p>
-            </div>
-
-            <div class="anime-actions">
-              <a href="<%= item.anime.link %>" class="btn btn-danger">▶️ Lanjutkan Menonton</a>
-            </div>
-          </div>
-        <% }) %>
-      </div>
-    <% } %>
   </div>
+
 </body>
 </html>
-

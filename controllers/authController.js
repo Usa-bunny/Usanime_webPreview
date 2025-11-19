@@ -64,7 +64,6 @@ const authController = {
                 role: user.akun.role
             };
 
-
             if (user.akun.role === 'admin') {
                 res.redirect('/usanime/admin');
             } else {

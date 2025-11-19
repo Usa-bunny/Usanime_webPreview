@@ -1,7 +1,8 @@
 const Anime = require("../models/animeModel");
 const Wishlist = require("../models/wishlistModel");
 const History = require('../models/historyModel');
-const cloudinary = require('../config/cloudinary')
+const cloudinary = require('../config/cloudinary');
+const mongoose = require("mongoose");
 const fs = require("fs");
 
 const animeController = {
@@ -27,6 +28,25 @@ const animeController = {
         } catch (error) {
             console.error(error);
             res.status(500).send("Error fetching anime list");
+        }
+    },
+
+    getDetailAnime: async (req, res) => {
+        try {
+            const { id } = req.params;
+
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                return res.status(400).send("ID tidak valid");
+            }
+
+            const anime = await Anime.findById(id);
+            if (!anime) return res.status(404).send("Anime tidak ditemukan");
+
+            res.render("animeDetail", { anime });
+
+        } catch (err) {
+            console.error("Detail anime error:", err);
+            res.status(500).send("Server error");
         }
     },
 
@@ -147,7 +167,7 @@ const animeController = {
                 ? await Wishlist.deleteOne({ _id: exist._id })
                 : await Wishlist.create({ user: userId, anime: animeId });
 
-            res.redirect("/usanime");
+            res.redirect("/usanime/wishlist");
 
         } catch (error) {
             console.error(error);

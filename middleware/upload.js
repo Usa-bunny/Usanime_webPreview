@@ -24,13 +24,13 @@ const storage = new CloudinaryStorage({
       public_id: `${safeName}_${Date.now()}`,
       transformation: [
         {
-          width: 600,          
-          height: 350,
-          crop: 'fill',        
-          gravity: 'center',   
+          width: 300,        
+          height: 400,      
+          crop: 'fill',
+          gravity: 'auto',    
         },
         {
-          quality: 'auto:eco', 
+          quality: 'auto:good',  
         },
       ],
       resource_type: 'image',

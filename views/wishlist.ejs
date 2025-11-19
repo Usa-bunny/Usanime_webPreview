@@ -4,47 +4,149 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wishlist Anime</title>
+
+  <!-- BOOTSTRAP -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
   <link rel="stylesheet" href="/css/style.css">
+
+  <style>
+    /* KONTEN BERGESER JIKA LAYAR LEBAR */
+    @media (min-width: 768px) {
+      .content-with-sidebar {
+        margin-left: 260px;
+      }
+    }
+
+    /* KARTU SAMA SEPERTI DAFTAR ANIME */
+    .anime-card {
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+      transition: .25s;
+      border: 1px solid #ddd;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      height: 100%;
+    }
+
+    .anime-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+
+    .anime-img {
+      width: 100%;
+      height: 400px;
+      object-fit: cover;
+    }
+
+    .anime-title {
+      padding: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      text-align: center;
+      min-height: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .rating-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,.7);
+      color: #ffd700;
+      padding: 5px 10px;
+      border-radius: 8px;
+      font-size: .85rem;
+      font-weight: 600;
+    }
+
+    /* TOMBOL DALAM KARTU */
+    .wishlist-actions {
+      padding: 10px 12px 15px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .btn-wishlist {
+      width: 100%;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+  </style>
 </head>
+
 <body class="anime-body">
+
+  <!-- SIDEBAR -->
   <%- include('sidebar') %>
 
-  <div class="content-wrapper">
-    <div class="page-header">
-      <h1 class="page-title">Wishlist Anime</h1>
-      <p class="page-subtitle">Anime yang ingin kamu tonton</p>
+  <!-- WRAPPER KONTEN -->
+  <div class="content-with-sidebar">
+
+    <div class="container py-4">
+
+      <!-- HEADER -->
+      <div class="text-center mb-4">
+        <h1 class="fw-bold">Wishlist Anime</h1>
+        <p class="text-muted">Anime yang ingin kamu tonton</p>
+      </div>
+
+      <!-- JIKA KOSONG -->
+      <% if (wishlist.length === 0) { %>
+        <div class="alert alert-warning text-center py-4" role="alert">
+          Kamu belum menambahkan anime ke wishlist.<br>
+          <small class="text-muted">Jelajahi daftar anime dan tambahkan favoritmu!</small>
+        </div>
+      <% } else { %>
+
+      <!-- GRID -->
+      <div class="row g-4">
+
+        <% wishlist.forEach(item => { %>
+
+          <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+
+            <div class="anime-card">
+
+              <div class="position-relative">
+                <img src="<%= item.anime.cover %>" class="anime-img" alt="<%= item.anime.title %>">
+                <span class="rating-badge">⭐ <%= item.anime.rating %></span>
+              </div>
+
+              <div class="anime-title">
+                <%= item.anime.title %>
+              </div>
+
+              <div class="wishlist-actions">
+                <a href="/usanime/wishlist/<%= item.anime._id %>" class="btn btn-danger btn-wishlist">
+                  ❌ Hapus
+                </a>
+                <a href="/usanime/history/add/<%= item.anime._id %>" class="btn btn-primary btn-wishlist">
+                  ▶️ Tonton
+                </a>
+              </div>
+
+            </div>
+
+          </div>
+
+        <% }) %>
+
+      </div>
+
+      <% } %>
+
     </div>
 
-    <% if (wishlist.length === 0) { %>
-      <div class="empty-state">
-        Kamu belum menambahkan anime ke wishlist.
-        <br>
-        <small style="color: #ffaaaa; margin-top: 10px; display: block;">
-          Jelajahi daftar anime dan tambahkan favoritmu ke sini!
-        </small>
-      </div>
-    <% } else { %>
-      <div class="anime-container">
-        <% wishlist.forEach(item => { %>
-          <div class="anime-item wishlist">
-            <img src="<%= item.anime.cover %>" alt="<%= item.anime.title %>" class="anime-cover">
-
-            <div class="anime-info">
-              <h3><%= item.anime.title %></h3>
-              <p><strong>🏷️ Genre:</strong> <%= item.anime.genre.join(", ") %></p>
-              <p><strong>⭐ Rating:</strong> <%= item.anime.rating %>/10</p>
-              <p><strong>🎬 Episode:</strong> <%= item.anime.episodes %></p>
-              <p class="anime-synopsis"><strong>📖 Sinopsis:</strong> <%= item.anime.synopsis %></p>
-            </div>
-
-            <div class="anime-actions">
-              <a href="/anime/wishlist/<%= item.anime._id %>" class="btn btn-danger">❌ Hapus Wishlist</a>
-              <a href="/anime/history/add/<%= item.anime._id %>" class="btn btn-primary">▶️ Tonton Sekarang</a>
-            </div>
-          </div>
-        <% }) %>
-      </div>
-    <% } %>
   </div>
+
 </body>
 </html>

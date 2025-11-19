@@ -6,10 +6,8 @@ const checkSession = require('../middleware/checkSession');
 const checkRole = require('../middleware/checkRole');
 const uploadImage = require('../middleware/upload');
 
-// Semua user login bisa lihat anime
 router.get('/', checkRole('user', 'admin'), animeController.getAllAnime);
 
-// Admin routes
 router.get('/admin', checkRole('admin'), animeController.getAllAnimeAdmin);
 router.get('/add', checkRole('admin'), checkSession, animeController.getAddAnime);
 router.get('/edit/:id', checkRole('admin'), checkSession, animeController.getEditAnime);
@@ -17,13 +15,13 @@ router.get('/delete/:id', checkRole('admin'), checkSession, animeController.dele
 router.post('/add', checkRole('admin'), checkSession, uploadImage.single('cover'), animeController.addAnime);
 router.post('/edit/:id', checkRole('admin'), checkSession, uploadImage.single('cover'), animeController.editAnime);
 
-// Wishlist routes
 router.get('/wishlist', checkRole('user', 'admin'), checkSession, animeController.getWishlist);
 router.get('/wishlist/:id', checkRole('user', 'admin'), checkSession, animeController.toggleWishlist);
 
-// History routes
 router.get('/history', checkRole('user', 'admin'), checkSession, animeController.getHistory);
 router.get('/history/add/:id', checkRole('user', 'admin'), checkSession, animeController.addToHistory);
+
+router.get("/:id", checkRole('user', 'admin'), animeController.getDetailAnime);
 
 module.exports = router;
 
